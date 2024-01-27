@@ -160,9 +160,6 @@ def main():
                         continue
 
     #For checkmate / end game screen
-    SIZE_OFFSET = .6 #% of screen
-    PLACEMENT_WIDTH_OFFSET = (SCREEN_WIDTH - (SCREEN_WIDTH * SIZE_OFFSET)) // 2
-    PLACEMENT_HEIGHT_OFFSET = (SCREEN_HEIGHT - (SCREEN_HEIGHT * SIZE_OFFSET)) // 2
     def draw_checkmate(state):
         draw(state)
         # Set up font

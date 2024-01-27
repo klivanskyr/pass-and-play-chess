@@ -115,7 +115,7 @@ class Normal(State):
                             return self
                         row += row_step
                         col += col_step
-            
+
             #If Pawn/King/Rook set moved to true
             if isinstance(clicked, King) or isinstance(clicked, Pawn) or isinstance(clicked, Rook):
                 clicked.moved = True
