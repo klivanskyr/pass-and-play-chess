@@ -1,1 +1,5 @@
-# pass-and-play-chess
+Pass and Play Chess!
+
+Known issues:
+no en peasant
+can castle through bishop
