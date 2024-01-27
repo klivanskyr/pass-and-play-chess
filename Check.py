@@ -18,6 +18,7 @@ class Check(State):
     def capture_at(self, released_row, released_col):
         clicked = self.pieces[self.row][self.col]
         released = self.pieces[released_row][released_col]
+        print(clicked, released)
 
         #Cannot move empty square
         if (not isinstance(clicked, Open)) and (clicked.can_move_to(released.row, released.col)):
@@ -51,7 +52,7 @@ class Check(State):
                     print(1)
                     step = -1 if clicked.row > released.row else 1
                     for i in range(clicked.row + step, released.row, step):
-                        if not isinstance(self.pieces[i][clicked.col], Open):
+                        if not isinstance(self.pieces[i][clicked.col], Open) and self.pieces[i][clicked.col] is not released:
                             return self
                     
                 #if on the same row(horizontal)
@@ -59,7 +60,7 @@ class Check(State):
                     print(2)
                     step = 1 if clicked.col < released.col else -1
                     for j in range(clicked.col + step, released.col, step):
-                        if not isinstance(self.pieces[clicked.row][j], Open):
+                        if not isinstance(self.pieces[clicked.row][j], Open) and self.pieces[clicked.row][j] is not released:
                             return self
 
                 #must be on diagonal if not on the rest
@@ -69,7 +70,8 @@ class Check(State):
                     col_step = 1 if clicked.col < released.col else -1
                     row, col = clicked.row + row_step, clicked.col + col_step
                     while (row, col) != (released.row, released.col):
-                        if not isinstance(self.pieces[row][col], Open):
+                        if not isinstance(self.pieces[row][col], Open) and self.pieces[row][col] is not released:
+                            print(3, self.pieces[row][col], released)
                             return self
                         row += row_step
                         col += col_step
@@ -85,6 +87,8 @@ class Check(State):
 
             #Advance turn
             self.turn.advance_turn()
+
+            print("SUCCESSFUL CAPTURE")
 
     def is_checkmate(self):
         #Looks at a position and determines if it is checkmate.

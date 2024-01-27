@@ -212,11 +212,9 @@ def main():
 
                     if state.turn.color == 0:
                         row = 7 - row
-                        #col = 7 - col
 
                     state.row = row
                     state.col = col
-                    #print(state)
                     print(f"Pressed at {row}, {col}\n")
                 elif event.type == pygame.MOUSEBUTTONUP:
                     x = event.pos[0]
@@ -227,7 +225,6 @@ def main():
 
                     if state.turn.color == 0:
                         row = 7 - row
-                        #col = 7 - col
 
                     before_capture = copy.deepcopy(state)
                     state.capture_at(row, col)                
@@ -239,7 +236,6 @@ def main():
                         state.checkmate = True
 
                     print(f"Released at {row}, {col}")
-                    #print(state)
                     print("NEXT TURN\n\n\n")
 
         pygame.display.update()
@@ -251,23 +247,10 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-        print("here")
         draw_checkmate(state)
         
 
         pygame.display.update()
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -284,7 +267,6 @@ def update(future, current) -> State:
     if future.pieces == current.pieces:
         #print("nothing changed")
         #print(future, current)
-        print("00")
         return current
     
     #find the cur king in future pieces. If the current side made a move that put themselves in check,
@@ -315,7 +297,7 @@ def update(future, current) -> State:
             if isinstance(future.pieces[i][j], King) and future.pieces[i][j].color == future.turn.color:
                 future_king = future.pieces[i][j]
 
-    #If the future king is can be taken by the cur pieces. It is now in check
+    #If the future king can be taken by the cur pieces. It is now in check
     future_king_is_in_check = False
     for i in range(len(future.pieces)):
         for j in range(len(future.pieces[i])):
@@ -330,23 +312,24 @@ def update(future, current) -> State:
                     future_king_is_in_check = True
 
 
+    #print(cur_king_is_in_check, cur_king.checked, future_king_is_in_check)
     #If the cur king and future king arent in check, it was just a normal move and can be played
-    if not cur_king_is_in_check and not future_king_is_in_check:
-        print(11)
+    if not cur_king_is_in_check and not future_king_is_in_check and not cur_king.checked:
+        #print(11)
         return future
     #If the current is not in check, and the future is in check. Set the future king to checked and update state
     if not cur_king_is_in_check and future_king_is_in_check:
-        print(22)
+        #print(22)
         future_king.checked = True
         return Check(future.turn, future.row, future.col, future.pieces)
     #If the cur king was checked but now it is not, return state to normal and removed checked
     if not cur_king_is_in_check and cur_king.checked:
-        print(33)
+        #print(33)
         cur_king.checked = False
         return Normal(future.turn, future.row, future.col, future.pieces)
     #If the cur king is in check, whatever piece was moved was pinned and so the move should have never happened
     if cur_king_is_in_check:
-        print(44)
+        #print(44)
         return current
 
     
@@ -378,8 +361,12 @@ def is_checkmate(state) -> bool:
         cannot_move = True
         for i, j in possible_squares:
             temp = copy.deepcopy(state)
+            #Set to having clicked on the piece
+            temp.row = checked_king.row
+            temp.col = checked_king.col
+            #Try to capture anywhere
             temp.capture_at(i, j)
-            update(temp, state)
+            temp = update(temp, state)
             #if temp pieces change, the king was able to move to a safe location.
             if temp.pieces != state.pieces:
                 cannot_move = False
@@ -433,7 +420,7 @@ def is_checkmate(state) -> bool:
                         temp.col = checked_piece.col
                         #Set released square
                         temp.capture_at(r, c)
-                        update(temp, state)
+                        temp = update(temp, state)
                         new_checked_king = temp.pieces[checked_king.row][checked_king.col]
                         #if the king has moved, then it cannot be blocked 
                         if isinstance(new_checked_king, King) and not new_checked_king.checked:
@@ -454,23 +441,20 @@ def is_checkmate(state) -> bool:
         elif len(checking_pieces) == 1:
             piece = checking_pieces[0]
             cannot_capture_attacker = True
+            print("HERREEEEEEEEEEEEEEEEEEEE", state.turn.color)
             for checked_piece in all_checked_pieces:
+                print("NEW PIECE", checked_piece)
+                #Set it to old color turn so capture at works
+                temp.turn.color = old_color
                 temp = copy.deepcopy(state)
                 #Set clicked piece
                 temp.row = checked_piece.row
                 temp.col = checked_piece.col
-                #Set released square
+                #Set released 
                 temp.capture_at(piece.row, piece.col)
-                update(temp, state)
+                temp = update(temp, state)
 
-                for row in temp.pieces:
-                    for elt in row:
-                        if isinstance(elt, King) and elt.color == state.turn.color:
-                            temp_king = elt
-                
-                if temp_king.checked:
-                    continue
-                else:
+                if not isinstance(temp, Check):
                     cannot_capture_attacker = False
                     break
             
