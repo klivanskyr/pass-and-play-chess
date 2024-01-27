@@ -441,11 +441,7 @@ def is_checkmate(state) -> bool:
         elif len(checking_pieces) == 1:
             piece = checking_pieces[0]
             cannot_capture_attacker = True
-            print("HERREEEEEEEEEEEEEEEEEEEE", state.turn.color)
             for checked_piece in all_checked_pieces:
-                print("NEW PIECE", checked_piece)
-                #Set it to old color turn so capture at works
-                temp.turn.color = old_color
                 temp = copy.deepcopy(state)
                 #Set clicked piece
                 temp.row = checked_piece.row
@@ -454,7 +450,8 @@ def is_checkmate(state) -> bool:
                 temp.capture_at(piece.row, piece.col)
                 temp = update(temp, state)
 
-                if not isinstance(temp, Check):
+                if temp.pieces != state.pieces:
+                    print(f"{checked_piece} CAN CAPTURE!")
                     cannot_capture_attacker = False
                     break
             
